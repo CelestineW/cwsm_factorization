@@ -9,33 +9,32 @@ public class Factor {
 				
 		System.out.println("factoring n: " + n);
 		
-		int i = 1;
-		BigInteger x = getRandBigInt(n);
-		BigInteger y = x;
-		int k = 2;
+		BigInteger x = new BigInteger("2");
+		BigInteger y = new BigInteger("2");
 		
 		BigInteger d = BigInteger.ONE;
 		
 		while (true) {
 			
-			i = i + 1;
-			BigInteger x_i = ((x.pow(2)).subtract(BigInteger.ONE).mod(n));
+			//BigInteger x_i = ((x.pow(2)).subtract(BigInteger.ONE).mod(n));
 			
-			System.out.println("x_i: " + x_i);
+			x = (x.pow(2)).add(BigInteger.ONE).mod(n);
+			y = (y.pow(2)).add(BigInteger.ONE).mod(n);
+			y = (y.pow(2)).add(BigInteger.ONE).mod(n);
 			
-			d = n.gcd(y.subtract(x_i));
+			d = n.gcd(x.subtract(y));
 			
 			System.out.println("current d: " + d);
 			
-			if (!(d == BigInteger.ONE) && !(d == n)) {
+			if (!d.equals(BigInteger.ONE) && !d.equals(n)) {
 				
 				System.out.println("Returning!!! " + d);
 				return d;
 			}
 			
-			if (i == k) {
-				y = x_i;
-				k = k * 2;				
+			// we will never find one this way 
+			if (d.equals(n)) {
+				return null;				
 			}
 			
 		}
