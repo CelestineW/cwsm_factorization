@@ -4,20 +4,39 @@ import java.util.*;
 public class Factor {
 	
 	static Random rand = new Random();
-
 	
-	public static void PollardRho(BigInteger n) {
+	public static BigInteger PollardRho(BigInteger n) {
+		
+		boolean loop = true;
 		
 		int i = 1;
-		Random rand = new Random();
-		BigInteger x1 = new BigInteger(n.bitLength(), rand);
-		BigInteger y = x1;
+		BigInteger x = getRandBigInt(n);
+		BigInteger y = x;
 		int k = 2;
 		
-		while (true) {
+		BigInteger d = null;
 		
-			i = i + 1; 			
+		while (loop) {
+			
+			i = i + 1;
+			BigInteger x_i = ((x.pow(2)).subtract(BigInteger.ONE).mod(n));
+			d = n.gcd(y.subtract(x_i));
+			
+			if ((d != BigInteger.ONE) && (d != n)) {
+				
+				loop = false;
+				return d;
+			}
+			
+			if (i == k) {
+				y = x_i;
+				k = k * 2;				
+			}
+			
 		}
+		
+		return d;
+		
 	}
 	
 	public static BigInteger PollardPMinusOne(BigInteger n){
