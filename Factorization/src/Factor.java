@@ -24,7 +24,7 @@ public class Factor {
 			
 			d = n.gcd(x.subtract(y));
 			
-			System.out.println("current d: " + d);
+			//System.out.println("current d: " + d);
 			
 			if (!d.equals(BigInteger.ONE) && !d.equals(n)) {
 				
@@ -47,9 +47,9 @@ public class Factor {
 		a = BigInteger.valueOf(2); // For Testing
 		
 		
-		System.out.println("Your num: " + n);
+		//System.out.println("Your num: " + n);
 		
-		System.out.println("Your base, a : " + a);
+		//System.out.println("Your base, a : " + a);
 		
 		
 		BigInteger m = a; // gets accumulated for faster computations
@@ -62,11 +62,11 @@ public class Factor {
 			// (a ^ k! mod n)
 			m = m.modPow(i, n);
 			
-			System.out.println("Your m, what you are gcding " + m.subtract(BigInteger.ONE));
+			//System.out.println("Your m, what you are gcding " + m.subtract(BigInteger.ONE));
 			
 			BigInteger gcdRes = n.gcd(m.subtract(BigInteger.ONE));
 			
-			System.out.println("GCD Result: " + gcdRes);
+			//System.out.println("GCD Result: " + gcdRes);
 			
 			
 			// Non-Trivial
@@ -76,7 +76,7 @@ public class Factor {
 				return gcdRes;
 			}
 			
-			System.out.println("Iterations: " + i.subtract(BigInteger.ONE));
+			//System.out.println("Iterations: " + i.subtract(BigInteger.ONE));
 			
 		}
 				
@@ -109,10 +109,15 @@ public class Factor {
 		
 		BigInteger k = new BigInteger("1633339503459119690580928718149821598898458545541617999969136559642034201952904677527967822044015401967438017");
 		BigInteger i = new BigInteger("15581958524003781659");
+	
+		BigInteger q = new BigInteger("1024");
 		
 		PollardRho(j);
+		PollardPMinusOne(j);
 		
-		//PollardPMinusOne(i);
+		PollardRho(i);
+		PollardPMinusOne(i);
+		
 	}
 	
 }
