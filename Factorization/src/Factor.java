@@ -6,25 +6,30 @@ public class Factor {
 	static Random rand = new Random();
 	
 	public static BigInteger PollardRho(BigInteger n) {
-		
-		boolean loop = true;
+				
+		System.out.println("factoring n: " + n);
 		
 		int i = 1;
 		BigInteger x = getRandBigInt(n);
 		BigInteger y = x;
 		int k = 2;
 		
-		BigInteger d = null;
+		BigInteger d = BigInteger.ONE;
 		
-		while (loop) {
+		while (true) {
 			
 			i = i + 1;
 			BigInteger x_i = ((x.pow(2)).subtract(BigInteger.ONE).mod(n));
+			
+			System.out.println("x_i: " + x_i);
+			
 			d = n.gcd(y.subtract(x_i));
 			
-			if ((d != BigInteger.ONE) && (d != n)) {
+			System.out.println("current d: " + d);
+			
+			if (!(d == BigInteger.ONE) && !(d == n)) {
 				
-				loop = false;
+				System.out.println("Returning!!! " + d);
 				return d;
 			}
 			
@@ -34,8 +39,6 @@ public class Factor {
 			}
 			
 		}
-		
-		return d;
 		
 	}
 	
@@ -98,10 +101,7 @@ public class Factor {
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		System.out.print("Factorizing Moduli");
-		System.out.println("trying again to commit/print");
-		System.out.println("Sara trying to commit");
-		System.out.println("Sara trying to commit again");
+		System.out.println("Factorizing Moduli");
 		
 		// Sample n 
 		BigInteger a = getRandBigInt(BigInteger.valueOf(1024));
@@ -110,10 +110,10 @@ public class Factor {
 		
 		BigInteger k = new BigInteger("1633339503459119690580928718149821598898458545541617999969136559642034201952904677527967822044015401967438017");
 		BigInteger i = new BigInteger("15581958524003781659");
-
 		
+		PollardRho(j);
 		
-		PollardPMinusOne(i);
+		//PollardPMinusOne(i);
 	}
 	
 }
