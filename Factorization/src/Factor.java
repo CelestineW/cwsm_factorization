@@ -5,6 +5,7 @@ public class Factor {
 	
 	static Random rand = new Random();
 	
+	// Pollard Rho implementation 
 	public static BigInteger PollardRho(BigInteger n) {
 		
 		BigInteger x = new BigInteger("2");
