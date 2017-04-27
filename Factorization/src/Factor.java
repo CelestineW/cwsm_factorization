@@ -6,8 +6,6 @@ public class Factor {
 	static Random rand = new Random();
 	
 	public static BigInteger PollardRho(BigInteger n) {
-				
-		System.out.println("factoring n: " + n);
 		
 		BigInteger x = new BigInteger("2");
 		BigInteger y = new BigInteger("2");
@@ -16,25 +14,20 @@ public class Factor {
 		
 		while (true) {
 			
-			//BigInteger x_i = ((x.pow(2)).subtract(BigInteger.ONE).mod(n));
-			
 			x = (x.pow(2)).add(BigInteger.ONE).mod(n);
 			y = (y.pow(2)).add(BigInteger.ONE).mod(n);
 			y = (y.pow(2)).add(BigInteger.ONE).mod(n);
 			
 			d = n.gcd(x.subtract(y));
 			
-			//System.out.println("current d: " + d);
-			
 			if (!d.equals(BigInteger.ONE) && !d.equals(n)) {
-				
-				System.out.println("Returning!!! " + d);
+				System.out.println("d: "+ d);
 				return d;
 			}
 			
 			// we will never find one this way 
 			if (d.equals(n)) {
-				return null;				
+				return n;				
 			}
 			
 		}
@@ -112,11 +105,11 @@ public class Factor {
 	
 		BigInteger q = new BigInteger("1024");
 		
-		PollardRho(j);
-		PollardPMinusOne(j);
+		//PollardRho(j);
+		//PollardPMinusOne(j);
 		
-		PollardRho(i);
-		PollardPMinusOne(i);
+		PollardRho(j);
+		//PollardPMinusOne(i);
 		
 	}
 	
