@@ -31,8 +31,9 @@ public class Factor {
 		
 		for (BigInteger key : moduli_map.keySet()) {
 			
+			Thread_Messenger isdone = new Thread_Messenger();
+			
 		    System.out.println(moduli_map.get(key));
-		    Boolean isdone = false;
 	
 			Thread t1 = new Thread(new PRThread(key, isdone));
 			Thread t2 = new Thread(new PMOThread(key, isdone));
@@ -53,17 +54,17 @@ public class Factor {
 	public static class PRThread implements Runnable {
 
 		private BigInteger num;
-		private boolean isDone;
+		private Thread_Messenger isDone;
 		   
-		PRThread(BigInteger n, boolean isdone) {
+		PRThread(BigInteger n, Thread_Messenger isdone) {
 			this.num = n;
 			this.isDone = isdone;
 			System.out.println("PR- Number to factor: " + n);
 		}
 		
 		public void run() {
-			PollardRho(this.num, this.isDone);
-			this.isDone = true;
+			PollardRho(this.num, isDone);
+			isDone.isFactored = true;
 			System.out.println("PR - Done with: " + num);
 			
 		}	
@@ -72,33 +73,38 @@ public class Factor {
 	public static class PMOThread implements Runnable {
 
 		private BigInteger num;
-		private boolean isDone;
+		private Thread_Messenger isDone;
 		   
-		PMOThread(BigInteger n, boolean isdone) {
+		PMOThread(BigInteger n, Thread_Messenger isdone) {
 			this.num = n;
 			this.isDone = isdone;
 			System.out.println("P Minus - Number to factor: " + n);
 		}
 		
 		public void run() {
-			PollardPMinusOneWrap(this.num, this.isDone);
-			this.isDone = true;
+			PollardPMinusOneWrap(this.num, isDone);
+			isDone.isFactored = true;
 			System.out.println("P Minus - Done with: " + num);
 		}	
 	}
 	
-	
+	private static class Thread_Messenger {
+		private boolean isFactored;
+		public Thread_Messenger() {
+			isFactored = false;
+		}
+	}
 	
 	
 	// Pollard Rho implementation 
-	public static BigInteger PollardRho(BigInteger n, boolean alreadyFactored) {
+	public static BigInteger PollardRho(BigInteger n, Thread_Messenger alreadyFactored) {
 		
 		BigInteger x = new BigInteger("2");
 		BigInteger y = new BigInteger("2");
 		
 		BigInteger d = BigInteger.ONE;
 		
-		while (true && !alreadyFactored) {
+		while (true && !alreadyFactored.isFactored) {
 			
 			x = (x.pow(2)).add(BigInteger.ONE).mod(n);
 			y = (y.pow(2)).add(BigInteger.ONE).mod(n);
@@ -121,7 +127,7 @@ public class Factor {
 		return BigInteger.valueOf(-1);
 	}
 	
-	public static BigInteger PollardPMinusOneWrap(BigInteger n, boolean alreadyFactored){
+	public static BigInteger PollardPMinusOneWrap(BigInteger n, Thread_Messenger alreadyFactored){
 				
 		Set<BigInteger> bases = new HashSet<BigInteger>();
 		BigInteger a = BigInteger.valueOf(2); // getting a base a,
@@ -129,7 +135,7 @@ public class Factor {
 		
 		BigInteger res = PollardPMinusOne(n,a);
 		
-		while((res.compareTo(BigInteger.valueOf(-1)) == 0 || res.compareTo(n) == 0) && !alreadyFactored) {
+		while((res.compareTo(BigInteger.valueOf(-1)) == 0 || res.compareTo(n) == 0) && !alreadyFactored.isFactored) {
 			
 			a = getRandBigInt(n);	
 			// 1 < a < n
