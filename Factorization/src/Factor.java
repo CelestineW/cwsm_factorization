@@ -9,51 +9,96 @@ import java.util.*;
 public class Factor {
 	
 	static Random rand = new Random();
-	static HashMap<BigInteger, String> moduli_map = new HashMap<BigInteger, String>();
+	static TreeMap<BigInteger, String> moduli_map = new TreeMap<BigInteger, String>();
 	
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException, InterruptedException {
 		// TODO Auto-generated method stub
 
 		File here = new File(".");
 		System.out.println(here.getAbsolutePath());
 		
-		File moduli_file = new File("/Users/cwong2/Documents/3_Junior Year/cmsc441_proj2/Factorization/src/temp_moduli.txt");
+		File moduli_file = new File("/Users/cwong2/Documents/3_Junior Year/cmsc441_proj2/Factorization/src/moduli_2_2.csv");
 		
 		Scanner input = new Scanner(moduli_file);
 
-		
+		input.nextLine();
+
 		while(input.hasNextLine()){
 			String[] moduli_set = input.nextLine().split(",");
-			System.out.println("Pair: " + moduli_set[0] + " " + moduli_set[1]);
-			//moduli_map.put(new BigInteger(moduli_set[1]), moduli_set[0]);
+			//System.out.println("Pair: " + moduli_set[0] + " " + moduli_set[1]);
+			moduli_map.put(new BigInteger(moduli_set[1]), moduli_set[0]);
+		}
+		
+		for (BigInteger key : moduli_map.keySet()) {
+			
+		    System.out.println(moduli_map.get(key));
+		    Boolean isdone = false;
+	
+			Thread t1 = new Thread(new PRThread(key, isdone));
+			Thread t2 = new Thread(new PMOThread(key, isdone));
+
+			t1.start();
+			t2.start();
+
+			t1.join();
+			t2.join();
+
 
 		}
 		
-		
-		// Sample n 
-		BigInteger a = getRandBigInt(BigInteger.valueOf(1024));
-		
-		BigInteger j = new BigInteger("5874944399468278831");
-		
-		BigInteger k = new BigInteger("1633339503459119690580928718149821598898458545541617999969136559642034201952904677527967822044015401967438017");
 
-		BigInteger i = new BigInteger("15581958524003781659");
-	
-		BigInteger q = new BigInteger("1024");
-		
-		//System.out.println(PollardPMinusOne(k));
 		
 	}
 	
+	public static class PRThread implements Runnable {
+
+		private BigInteger num;
+		private boolean isDone;
+		   
+		PRThread(BigInteger n, boolean isdone) {
+			this.num = n;
+			this.isDone = isdone;
+			System.out.println("PR- Number to factor: " + n);
+		}
+		
+		public void run() {
+			PollardRho(this.num, this.isDone);
+			this.isDone = true;
+			System.out.println("PR - Done with: " + num);
+			
+		}	
+	}
+
+	public static class PMOThread implements Runnable {
+
+		private BigInteger num;
+		private boolean isDone;
+		   
+		PMOThread(BigInteger n, boolean isdone) {
+			this.num = n;
+			this.isDone = isdone;
+			System.out.println("P Minus - Number to factor: " + n);
+		}
+		
+		public void run() {
+			PollardPMinusOneWrap(this.num, this.isDone);
+			this.isDone = true;
+			System.out.println("P Minus - Done with: " + num);
+		}	
+	}
+	
+	
+	
+	
 	// Pollard Rho implementation 
-	public static BigInteger PollardRho(BigInteger n) {
+	public static BigInteger PollardRho(BigInteger n, boolean alreadyFactored) {
 		
 		BigInteger x = new BigInteger("2");
 		BigInteger y = new BigInteger("2");
 		
 		BigInteger d = BigInteger.ONE;
 		
-		while (true) {
+		while (true && !alreadyFactored) {
 			
 			x = (x.pow(2)).add(BigInteger.ONE).mod(n);
 			y = (y.pow(2)).add(BigInteger.ONE).mod(n);
@@ -62,23 +107,48 @@ public class Factor {
 			d = n.gcd(x.subtract(y));
 			
 			if (!d.equals(BigInteger.ONE) && !d.equals(n)) {
+				System.out.println( moduli_map.get(n) + " is factorable by " + d + " and " + n.divide(d));
 				return d;
 			}
 			
 			// we will never find one this way 
 			if (d.equals(n)) {
+				System.out.println("Could not factor");
 				return n;				
 			}
 		}
+		
+		return BigInteger.valueOf(-1);
 	}
 	
-	public static BigInteger PollardPMinusOne(BigInteger n){
+	public static BigInteger PollardPMinusOneWrap(BigInteger n, boolean alreadyFactored){
+				
+		Set<BigInteger> bases = new HashSet<BigInteger>();
+		BigInteger a = BigInteger.valueOf(2); // getting a base a,
+		bases.add(a);
 		
-		BigInteger a = getRandBigInt(n); // getting a base a,
-		a = BigInteger.valueOf(2); // For Testing
+		BigInteger res = PollardPMinusOne(n,a);
+		
+		while((res.compareTo(BigInteger.valueOf(-1)) == 0 || res.compareTo(n) == 0) && !alreadyFactored) {
+			
+			a = getRandBigInt(n);	
+			// 1 < a < n
+			while((BigInteger.ONE.compareTo(a) == 1  && a.compareTo(n) == 1) || bases.contains(a)){
+				a = getRandBigInt(n);
+			}
+			bases.add(a);
+			res = PollardPMinusOne(n,a);	
+			
+		}
+		// Should never reach here.
+		return BigInteger.valueOf(-1);
+	}
+	
+	public static BigInteger PollardPMinusOne(BigInteger n, BigInteger a){
+		
 		
 		BigInteger m = a; // gets accumulated for faster computations
-		BigInteger bound = new BigInteger("10000000"); // B set according to elliptic curve method
+		BigInteger bound = new BigInteger("1000000"); // B set according to elliptic curve method
 		
 		for (BigInteger i = BigInteger.valueOf(2); i.compareTo(bound) <  0 ; i = i.add(BigInteger.ONE)){	
 			// (a ^ k! mod n)
@@ -88,6 +158,7 @@ public class Factor {
 
 			// Non-Trivial
 			if (gcdRes.compareTo(BigInteger.ONE) != 0){
+				System.out.println(moduli_map.get(n) + " is factorable by " + gcdRes + " and " + n.divide(gcdRes));
 				return gcdRes;
 			}
 
