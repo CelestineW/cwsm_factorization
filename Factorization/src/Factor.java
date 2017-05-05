@@ -141,7 +141,10 @@ public class Factor {
 	}
 	
 	
-	// Pollard Rho implementation 
+	/* Pollard Rho implementation
+	 * @params
+	 * n: number to be factored  
+	 */
 	public static BigInteger PollardRho(BigInteger n, Thread_Messenger alreadyFactored) {
 		
 		BigInteger x = new BigInteger("2");
